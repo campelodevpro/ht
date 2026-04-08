@@ -1,14 +1,462 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Meu Primeiro Projeto</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matriz Eisenhower</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --card: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      --q1: linear-gradient(135deg, #ef4444, #b91c1c);
+      --q2: linear-gradient(135deg, #f59e0b, #d97706);
+      --q3: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      --q4: linear-gradient(135deg, #10b981, #047857);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.20), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.16), transparent 30%),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 860px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0 34px;
+    }
+
+    .pill {
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+    }
+
+    .matrix-wrapper {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .y-axis {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .axis-box {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      min-height: 280px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 18px;
+    }
+
+    .x-axis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .axis-top {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px 22px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .quadrant {
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      min-height: 290px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .quadrant::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02));
+      pointer-events: none;
+    }
+
+    .q1 { background: var(--q1); }
+    .q2 { background: var(--q2); }
+    .q3 { background: var(--q3); }
+    .q4 { background: var(--q4); }
+
+    .quadrant-header {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 18px;
+    }
+
+    .quadrant-header .tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .quadrant-header h2 {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    .quadrant-header p {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+
+    .task-list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .task {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      padding: 14px 15px;
+      backdrop-filter: blur(8px);
+    }
+
+    .task-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      opacity: 0.92;
+    }
+
+    @media (max-width: 980px) {
+      .matrix-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .y-axis {
+        display: none;
+      }
+
+      .matrix,
+      .x-axis {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .quadrant {
+        min-height: auto;
+      }
+    }
+  </style>
 </head>
-
 <body>
-    <h1>🚀 Projeto no GitHub funcionando!</h1>
-    <p>Subi meu primeiro HTML com sucesso 😎</p>
-</body>
+  <div class="container">
+    <section class="hero">
+      <h1>⚡ Matriz Eisenhower</h1>
+      <p>
+        Organize projetos, demandas e atividades com clareza visual e foco estratégico.
+        Priorize o que realmente move resultado, reduza ruído operacional e tome decisões com mais velocidade.
+      </p>
+    </section>
 
+    <div class="legend">
+      <div class="pill">🔥 Fazer agora</div>
+      <div class="pill">📅 Planejar</div>
+      <div class="pill">🤝 Delegar</div>
+      <div class="pill">🧹 Eliminar</div>
+    </div>
+
+    <div class="matrix-wrapper">
+      <div class="y-axis">
+        <div class="axis-box">URGENTE</div>
+        <div class="axis-box">NÃO URGENTE</div>
+      </div>
+
+      <div class="main">
+        <div class="x-axis">
+          <div class="axis-top">IMPORTANTE</div>
+          <div class="axis-top">NÃO IMPORTANTE</div>
+        </div>
+
+        <div class="matrix">
+          <!-- Q1 -->
+          <div class="quadrant q1">
+            <div class="quadrant-header">
+              <span class="tag">Quadrante 1</span>
+              <h2>Fazer Agora</h2>
+              <p>Tarefas críticas, com impacto direto e prazo curto. Aqui entram os incêndios reais.</p>
+            </div>
+
+            <ul class="task-list">
+              <li class="task">
+                <div class="task-title">Corrigir falha no sistema de pagamentos</div>
+                <div>Bloqueio em processo financeiro com risco de atraso a fornecedores.</div>
+                <div class="task-meta">
+                  <span class="badge">Alta prioridade</span>
+                  <span class="badge">Prazo: hoje</span>
+                  <span class="badge">Impacto crítico</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Responder incidentes de segurança reportados</div>
+                <div>Validação técnica e contenção inicial de acessos até esclarecimento do fornecedor.</div>
+                <div class="task-meta">
+                  <span class="badge">Segurança</span>
+                  <span class="badge">Urgente</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Aprovar entrega final do projeto web MVP</div>
+                <div>Concluir validação com regras críticas antes da janela de publicação.</div>
+                <div class="task-meta">
+                  <span class="badge">Projeto estratégico</span>
+                  <span class="badge">Hoje</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Q3 -->
+          <div class="quadrant q3">
+            <div class="quadrant-header">
+              <span class="tag">Quadrante 3</span>
+              <h2>Delegar</h2>
+              <p>Demandas urgentes, mas com baixo valor estratégico direto para sua atuação principal.</p>
+            </div>
+
+            <ul class="task-list">
+              <li class="task">
+                <div class="task-title">Atualizar planilha operacional de acompanhamento</div>
+                <div>Consolidação de status rotineiro que pode ser distribuída ao time de apoio.</div>
+                <div class="task-meta">
+                  <span class="badge">Delegável</span>
+                  <span class="badge">Baixo impacto</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Agendar reunião de alinhamento semanal</div>
+                <div>Organização de agenda, convites e registro inicial de pauta.</div>
+                <div class="task-meta">
+                  <span class="badge">Administrativo</span>
+                  <span class="badge">Apoio</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Responder solicitações operacionais repetitivas</div>
+                <div>Pedidos simples e recorrentes que podem seguir fluxo padrão.</div>
+                <div class="task-meta">
+                  <span class="badge">Rotina</span>
+                  <span class="badge">Padronizável</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Q2 -->
+          <div class="quadrant q2">
+            <div class="quadrant-header">
+              <span class="tag">Quadrante 2</span>
+              <h2>Planejar</h2>
+              <p>Atividades importantes que constroem resultado sustentável, mas exigem agenda e disciplina.</p>
+            </div>
+
+            <ul class="task-list">
+              <li class="task">
+                <div class="task-title">Estruturar roadmap de automação com IA</div>
+                <div>Definir fases, ganhos, riscos e critérios de priorização para o próximo ciclo.</div>
+                <div class="task-meta">
+                  <span class="badge">Estratégico</span>
+                  <span class="badge">Médio prazo</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Revisar governança de acessos e MFA</div>
+                <div>Fortalecer segurança preventiva antes de incidentes futuros.</div>
+                <div class="task-meta">
+                  <span class="badge">Prevenção</span>
+                  <span class="badge">Alta relevância</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Desenhar dashboard executivo de indicadores</div>
+                <div>Transformar dados operacionais em visão gerencial para diretoria.</div>
+                <div class="task-meta">
+                  <span class="badge">Decisão</span>
+                  <span class="badge">Valor alto</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Q4 -->
+          <div class="quadrant q4">
+            <div class="quadrant-header">
+              <span class="tag">Quadrante 4</span>
+              <h2>Eliminar</h2>
+              <p>Atividades com baixo retorno, pouca relevância ou que apenas consomem energia e foco.</p>
+            </div>
+
+            <ul class="task-list">
+              <li class="task">
+                <div class="task-title">Reuniões sem pauta e sem decisão clara</div>
+                <div>Bloqueiam tempo da equipe e raramente geram avanço real.</div>
+                <div class="task-meta">
+                  <span class="badge">Desperdício</span>
+                  <span class="badge">Cortar</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Retrabalho manual em controles paralelos</div>
+                <div>Duplicação de registros em ferramentas que não agregam governança.</div>
+                <div class="task-meta">
+                  <span class="badge">Baixo valor</span>
+                  <span class="badge">Automatizar ou remover</span>
+                </div>
+              </li>
+
+              <li class="task">
+                <div class="task-title">Interrupções constantes por tarefas não priorizadas</div>
+                <div>Demandas avulsas que quebram o foco e atrasam entregas estratégicas.</div>
+                <div class="task-meta">
+                  <span class="badge">Distração</span>
+                  <span class="badge">Bloquear</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Matriz de priorização baseada no método Eisenhower — simples, visual e poderosa para tomada de decisão.
+    </div>
+  </div>
+</body>
 </html>
